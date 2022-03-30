@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="This is a testing site for discovering the benefits of PWA including GPS tracking.">
+  <link rel="manifest" href="/manifest.json">
+  <script src="/js/app.js" defer></script>
+  <script src="/js/sidebar.js" defer></script>
+  <title>Davis Poet Laureate Project App</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <!-- IOS Support  -->
+  <link rel="apple-touch-icon" href="/image/icon-192.png">
+  <meta name="apple-mobile-web-app-status-bar" content="#111111">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/png" sizes="48x48" href="/image/favicon-48x48.png">
+  <link rel="shortcut icon" href="./favicon.ico">
+
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="nav-menu-button">
+        <!-- <button id="openBtn">&#9776; MENU</button> -->
+      </div>
+      <div id="sidebar" class="nav-sidebar">
+        <button id="closeBtn">&times;</button>
+        <!-- <a href="#">About The Project</a> -->
+        <a href="#">Poems</a>
+        <ul>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-1" target="_blank">Poem 1</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-2" target="_blank">Poem 2</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-3" target="_blank">Poem 3</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-4" target="_blank">Poem 4</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-5" target="_blank">Poem 5</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-6" target="_blank">Poem 6</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-7" target="_blank">Poem 7</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-8" target="_blank">Poem 8</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-9" target="_blank">Poem 9</a></li>
+          <li><a href="https://sites.google.com/view/soundriver/home/the-poems/poem-10" target="_blank">Poem 10</a></li>
+        </ul>
+        <!-- <a href="#">Privacy Policy</a> -->
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <section id="main-header" style="background-image: url(/image/mtb-image.jpg);">
+        <button id="stop-sound">Pause &equals;</button>
+        <button id="resume-sound">Resume &vrtri;</button>
+      </section>
+      <section id="main-content">
+        <div class="content-container">
+          <div class="tracking-controls">
+            <div class="toggle-group">
+              <label class="switch">
+                <input type="checkbox" name="tracking-toggle" id="tracking-toggle" tabindex="0">
+                <span class="slider round"></span>
+              </label>
+              <div class="power-indicator">
+                <div id="on" class="dim">ON</div>
+                <div id="off" class="lit">OFF</div>
+              </div>
+
+            </div>
+            <div class="tracking-info">
+              <div id="tracking-message-box">
+                <div id="tracking-message">
+                  <span id="tracking"></span>
+                </div>
+              </div>
+              <div class="coordinate-container">
+                <span id="sheets"></span>
+                <span id="latDisplay"></span>
+                <span id="longDisplay"></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-content">
+            <h2>Davis Poet Laureate Project</h2>
+            <h3>
+              <img class="arrow" src="/image/arrow-left-up.png" alt="arrow pointing to toggle">
+              Toggle switch to start tracking</h3>
+            <input type="button" value="Details" tabindex="1">
+            <div id="details" class="no-display">
+              <ol>
+                <li>Please "Allow" locations permissions</li>
+                <li>Allow or remove any popup blockers for this domain</li>
+                <li>Toggle the Start switch to the on position and the poems will start launching automatically</li>
+                <li>When you're done or to stop the app at any time, simply toggle the Start switch to the OFF postition</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    <div class="footer-details">
+      &copy; 2022 Design Hub
+    </div>
+  </footer>
+</body>
+</html>

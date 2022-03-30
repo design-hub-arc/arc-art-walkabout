@@ -1,0 +1,27 @@
+{
+  "name": "ARC Art Walk Project",
+  "short_name": "Art Walk Project",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color" : "#111111",
+  "orientation" : "portrait-primary",
+  "icons" : [
+    {
+      "src": "image/icon-192.png",
+      "type": "image/png",
+      "sizes" : "192x192"
+    },
+    {
+      "src": "image/icon-512.png",
+      "type": "image/png",
+      "sizes" : "512x512"
+    },
+    {
+      "src": "image/maskable_icon.png",
+      "type": "image/png",
+      "sizes" : "192x192",
+      "purpose" : "maskable"
+    }
+  ]
+}
