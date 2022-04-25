@@ -10,30 +10,34 @@ const offIndicator = document.getElementById('off')
 const leftArrow = document.querySelector('.arrow')
 const mainHeaderImage = document.getElementById('main-header')
 
+
 const stopBtn = document.getElementById('stop-sound')
 const resumeBtn = document.getElementById('resume-sound')
 stopBtn.style.display = 'none'
 resumeBtn.style.display = 'none'
 
 
-const MASTER_URL = 'https://docs.google.com/spreadsheets/d/15WHrKYdLhyepMQPdWtqZQAeHonpC-ntF1PIldJz_hjQ/gviz/tq?tqx=out:json'
+const MASTER_URL = 'https://docs.google.com/spreadsheets/d/1b6kB5xtP_M0hMLRzxT0uDwhuM9ABvzsMUZRVsnezgXU/gviz/tq?tqx=out:json'
+// const MASTER_URL = 'https://docs.google.com/spreadsheets/d/15WHrKYdLhyepMQPdWtqZQAeHonpC-ntF1PIldJz_hjQ/gviz/tq?tqx=out:json'
 const SOUND_DRIVE_URL = 'https://docs.google.com/uc?export=download&id='
+const CMS_IMAGE_URL = 'https://docs.google.com/uc?export=download&id='
+
 
 //Constants for establishing an equal perimeter. Can be adjusted to fit the bounding area
-const LAT_RADIUS = 0.000240
-const LON_RADIUS = 0.000240 // 70 ft radius .000024 = 7ft ~.00000343 = 1ft
+const LAT_RADIUS = 0.00008575
+const LON_RADIUS = 0.00008575 // 70 ft radius .000024 = 7ft ~.00000343 = 1ft
 // position tracking
 let geoWatch;
 let lonCoordCheck;
 let latCoordCheck;
+let locationArray = []
 
 // if port is needed
 let port = window.location.port
 
-// identifying poem location
-let poem;
+// identifying Artist or location
 let identifier;
-
+let trimmedName;
 // Log the currently launched external url
 const openTab = []
 let tabHasLaunched = false;
@@ -61,10 +65,6 @@ class Sound {
     }
   }
 }
-
-
-// let sound1 = new Sound('../sound/poem1.mp3')
-// let sound1 = new Sound('https://docs.google.com/uc?export=download&id=1PhqYAw8-INVo6-QWHVPZJADOsmwXtzem')
 
 // register service worker for caching assets
 if('serviceWorker' in navigator) {
@@ -160,7 +160,24 @@ function closeTab() {
 
 // Create variables 
 // Variables needed:
-// lat, lon, image, soundFile, artist, min, sec
+// lat, lon, webpage, soundFile, NULL, min, sec, name, location, image
+// Create Variables
+const createObj = (obj, objLen) => {
+  for(let i = 0; i < objLen; i++) {
+    locationArray[i] = {
+      lat : obj[i].c[0].v,
+      lon: obj[i].c[1].v,
+      url: obj[i].c[2].v,
+      soundLink: obj[i].c[3].v,
+      min: obj[i].c[5].v,
+      sec: obj[i].c[6].v,
+      name: obj[i].c[7].v,
+      loc: obj[i].c[8].v,
+      image: obj[i].c[9].v,
+
+    }
+  }
+}
 const createLat = (obj, objLen) => {
   for(let i = 0; i < objLen; i++){
     this[`lat${i + 1}`] = parseFloat(`${obj[i].c[0].v}`) // COLUMN A
@@ -171,9 +188,9 @@ const createLon = (obj, objLen) => {
     this[`lon${i + 1}`] = parseFloat(`${obj[i].c[1].v}`) // COLUMN B
   }
 }
-const createImage = (obj, objLen) => {
+const createUrl = (obj, objLen) => {
   for(let i = 0; i < objLen; i++){
-    this[`image${i + 1}`] = `${obj[i].c[2].v}`            // COLUMN C
+    this[`url${i + 1}`] = `${obj[i].c[2].v}`            // COLUMN C
   }
 }
 const createSoundLink = (obj, objLen) => {
@@ -191,16 +208,21 @@ const createSec = (obj, objLen) => {
     this[`sec${i + 1}`] = `${obj[i].c[6].v}`         // COLUMN G
   }
 }
-// const createName = (obj, objLen) => {
-//   for(let i = 0; i < objLen; i++){
-//     this[`name${i + 1}`] = `${obj[i].c[7].v}`       // COLUMN H
-//   }
-// }
-// const createLocation = (obj, objLen) => {
-//   for(let i = 0; i < objLen; i++){
-//     this[`loc${i + 1}`] = `${obj[i].c[8].v}`       // COLUMN I
-//   }
-// }
+const createName = (obj, objLen) => {
+  for(let i = 0; i < objLen; i++){
+    this[`name${i + 1}`] = `${obj[i].c[7].v}`    // COLUMN H
+  }
+}
+const createLocation = (obj, objLen) => {
+  for(let i = 0; i < objLen; i++){
+    this[`loc${i + 1}`] = `${obj[i].c[8].v}`    // COLUMN I
+  }
+}
+const createImage = (obj, objLen) => {
+  for(let i = 0; i < objLen; i++){
+    this[`image${i + 1}`] = `${obj[i].c[9].v}`  // COLUMN J
+  }
+}
 
 // begin to fetch coordinates and set the geolocation
 function setCurrentPosition( position ) {
@@ -223,16 +245,49 @@ function setCurrentPosition( position ) {
       let resultLength = Object.keys(result).length // set length for dynamic variable rendering
 
       // Calling functions to dynamically render variables
+      createObj(result, resultLength)
       createLat(result, resultLength)
       createLon(result, resultLength)
-      createImage(result, resultLength)
+      createUrl(result, resultLength)
       createSoundLink(result, resultLength)
       createMin(result, resultLength)
       createSec(result, resultLength)
       createName(result, resultLength)
       createLocation(result, resultLength)
+      createImage(result, resultLength)
     
+      const createContent = (obj) => {
+        trimmedName = obj.name.replace(/\s+/g, '')
+          // obj.url = obj.youtubeUrl
+          mainHeaderImage.style.backgroundImage = `url(${obj.image})`
+          let timer = (((obj.min*60) + obj.sec) * 1000)
+          let soundFile = SOUND_DRIVE_URL + obj.soundLink
+          if(!openTab.includes(obj.url)) {
+              
+            playSound(soundFile, timer)
+            
+            // Set identifier to current poem
+            identifier = obj.url
+            
+            // launch the new window with the poems page and push the location of the open tab to openTab
+            openTab.push(obj.url)
+  
+            // Set boolean to true for conditional testing
+            tabHasLaunched = true
+            
+            // If a tab already exists, close it
+            if(openTab[1]) {
+              closeTab()
+            }
     
+            // Auto close the tab after the length of the current poem has passed
+            setTimeout(() => {
+              tabHasLaunched = false;
+            }, timer)
+          }
+        sheets.style.fontWeight = 'bold'  
+        sheets.innerText = obj.loc // Output the name of the current poem or location
+      }
 
     console.log('fetched')
     
@@ -242,305 +297,285 @@ function setCurrentPosition( position ) {
     latCoordCheck = position.coords.latitude
     lonCoordCheck = position.coords.longitude
 
+    const findCoords = (coord) => latCoordCheck >= (coord.lat - LAT_RADIUS) && latCoordCheck <= (coord.lat + LAT_RADIUS) && lonCoordCheck >= (coord.lon - LON_RADIUS) && lonCoordCheck <= (coord.lon + LON_RADIUS) 
+
+    let coordIndex = locationArray.findIndex(findCoords)
+
+    if(!tabHasLaunched && coordIndex > -1) {
+      createContent(locationArray[coordIndex])
+      }
     //testing truthiness of condition
-    // console.log("poem 1", latCoordCheck >= (lat1 - LAT_RADIUS) , latCoordCheck <= (lat1 + LAT_RADIUS) ,lonCoordCheck >= (lon1 - LON_RADIUS) ,lonCoordCheck <= (lon1 + LON_RADIUS))
-    // console.log(lonCoordCheck, lon1, LON_RADIUS, typeof (lon1 + LON_RADIUS))
-
-
     // Conditionally checking and functionality of launching external sites
 
     // if the coordinate bounding box is entered
-    // Use classes to render these? --
-    
-    // POEM 1 ////////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat1 - LAT_RADIUS) && latCoordCheck <= (lat1 + LAT_RADIUS) && lonCoordCheck >= (lon1 - LON_RADIUS) && lonCoordCheck <= (lon1 + LON_RADIUS)) {
-        poem = name1.replace(/\s+/g, '')
-        url1 = youtubeUrl1
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min1*60) + sec1) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url1
+    // Artist 1 ////////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat1 - LAT_RADIUS) && latCoordCheck <= (lat1 + LAT_RADIUS) && lonCoordCheck >= (lon1 - LON_RADIUS) && lonCoordCheck <= (lon1 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image1})`
+    //     let timer = (((min1*60) + sec1) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink1
         
-        // if the window has not previously been opened
-        // if(openTab[0] !== `${url1}` && openTab !== `${url1}` && identifier !== url1) {
-          if(!openTab.includes(url1)) {
+    //     // if the window has not previously been opened
+    //       if(!openTab.includes(soundLink1)) {
             
-          playSound(soundFile, timer)
+    //       playSound(soundFile, timer)
           
-          // Set identifier to current poem
-          identifier = url1
+    //       // Set identifier to current artist
+    //       identifier = artist1
           
-          // launch the new window with the poems page and push the location of the open tab to openTab
-          openTab.push(url1)
+    //       // launch the new window and or sound file with the artists page and or file, 
+    //       // and push the file id of the open tab to openTab
+    //       openTab.push(soundLink1)
 
-          // Set boolean to true for conditional testing
-          tabHasLaunched = true
+    //       // Set boolean to true for conditional testing
+    //       tabHasLaunched = true
           
-          // If a tab already exists, close it
-          if(openTab[1]) {
-            closeTab()
-          }
+    //       // If a tab already exists, close it
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
   
-          // Auto close the tab after the length of the current poem has passed
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-      sheets.style.fontWeight = 'bold'  
-      sheets.innerText = loc1 // Output the name of the current poem or location
-      }
-    }
+    //       // Auto close the tab after the length of the current sound has passed
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //   sheets.style.fontWeight = 'bold'  
+    //   sheets.innerText = artist1 // Output the name of the current artist or location
+    //   }
+    // }
 
-    // there will be the same code block for each location
-    // maybe these can be modularized
-    // console.log("poem 2", latCoordCheck >= (lat2 - LAT_RADIUS) , latCoordCheck <= (lat2 + LAT_RADIUS) ,lonCoordCheck >= (lon2 - LON_RADIUS) ,lonCoordCheck <= (lon2 + LON_RADIUS))
-    // POEM 2 ///////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat2 - LAT_RADIUS) && latCoordCheck <= (lat2 + LAT_RADIUS) && lonCoordCheck >= (lon2 - LON_RADIUS) && lonCoordCheck <= (lon2 + LON_RADIUS)) {
-        poem = name2.replace(/\s+/g, '')
-        url2 = youtubeUrl2
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min2*60) + sec2) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url2
+    // // there will be the same code block for each location
+    // // maybe these can be modularized
+    
+    // // Artist 2 ///////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat2 - LAT_RADIUS) && latCoordCheck <= (lat2 + LAT_RADIUS) && lonCoordCheck >= (lon2 - LON_RADIUS) && lonCoordCheck <= (lon2 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image2})`
+    //     let timer = (((min2*60) + sec2) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink2
 
-        if(!openTab.includes(url2)) {
-          playSound(soundFile, timer)
-          identifier = url2
-          openTab.push(url2)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'  
-        sheets.innerText = loc2
+    //     if(!openTab.includes(soundLink2)) {
+    //       playSound(soundFile, timer)
+    //       identifier = artist2
+    //       openTab.push(soundLink2)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'  
+    //     sheets.innerText = artist2
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 3 ////////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat3 - LAT_RADIUS) && latCoordCheck <= (lat3 + LAT_RADIUS) && lonCoordCheck >= (lon3 - LON_RADIUS) && lonCoordCheck <= (lon3 + LON_RADIUS)) {
-        poem = name3.replace(/\s+/g, '')
-        url3 = youtubeUrl3
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min3*60) + sec3) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url3
-        if(!openTab.includes(url3)) {
+    // // Artist 3 ////////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat3 - LAT_RADIUS) && latCoordCheck <= (lat3 + LAT_RADIUS) && lonCoordCheck >= (lon3 - LON_RADIUS) && lonCoordCheck <= (lon3 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image3})`
+    //     let timer = (((min3*60) + sec3) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink3
+    //     if(!openTab.includes(soundLink3)) {
           
-          playSound(soundFile, timer)
-          identifier = url3
-          openTab.push(url3)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc3
+    //       playSound(soundFile, timer)
+    //       identifier = artist3
+    //       openTab.push(soundLink3)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist3
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 4 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat4 - LAT_RADIUS) && latCoordCheck <= (lat4 + LAT_RADIUS) && lonCoordCheck >= (lon4 - LON_RADIUS) && lonCoordCheck <= (lon4 + LON_RADIUS)) {
-        poem = name4.replace(/\s+/g, '')
-        url4 = youtubeUrl4
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min4*60) + sec4) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url4
+    // // Artist 4 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat4 - LAT_RADIUS) && latCoordCheck <= (lat4 + LAT_RADIUS) && lonCoordCheck >= (lon4 - LON_RADIUS) && lonCoordCheck <= (lon4 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image4})`
+    //     let timer = (((min4*60) + sec4) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink4
 
-        if(!openTab.includes(url4)) {
-          playSound(soundFile, timer)
-          identifier = url4
-          openTab.push(url4)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc4
+    //     if(!openTab.includes(soundLink4)) {
+    //       playSound(soundFile, timer)
+    //       identifier = artist4
+    //       openTab.push(soundLink4)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist4
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 5 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat5 - LAT_RADIUS) && latCoordCheck <= (lat5 + LAT_RADIUS) && lonCoordCheck >= (lon5 - LON_RADIUS) && lonCoordCheck <= (lon5 + LON_RADIUS)) {
-        poem = name5.replace(/\s+/g, '')
-        url5 = youtubeUrl5
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
+    // // Artist 5 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat5 - LAT_RADIUS) && latCoordCheck <= (lat5 + LAT_RADIUS) && lonCoordCheck >= (lon5 - LON_RADIUS) && lonCoordCheck <= (lon5 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image5})`
+    //     let timer = (((min5*60) + sec5) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink5
 
-        let timer = (((min5*60) + sec5) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url5
-
-        if(!openTab.includes(url5)){
-          playSound(soundFile, timer)
-          identifier = url5
-          openTab.push(url5)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc5
+    //     if(!openTab.includes(soundLink5)){
+    //       playSound(soundFile, timer)
+    //       identifier = artist5
+    //       openTab.push(soundLink5)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist5
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 6 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat6 - LAT_RADIUS) && latCoordCheck <= (lat6 + LAT_RADIUS) && lonCoordCheck >= (lon6 - LON_RADIUS) && lonCoordCheck <= (lon6 + LON_RADIUS)) {
-        poem = name6.replace(/\s+/g, '')
-        url6 = youtubeUrl6
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
+    // // Artist 6 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat6 - LAT_RADIUS) && latCoordCheck <= (lat6 + LAT_RADIUS) && lonCoordCheck >= (lon6 - LON_RADIUS) && lonCoordCheck <= (lon6 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image6})`
 
-        let timer = (((min6*60) + sec6) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url6
+    //     let timer = (((min6*60) + sec6) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink6
 
-        if(!openTab.includes(url6)) {
-          playSound(soundFile, timer)
-          identifier = url6
-          openTab.push(url6)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc6
+    //     if(!openTab.includes(soundLink6)) {
+    //       playSound(soundFile, timer)
+    //       identifier = artist6
+    //       openTab.push(soundLink6)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist6
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 7 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat7 - LAT_RADIUS) && latCoordCheck <= (lat7 + LAT_RADIUS) && lonCoordCheck >= (lon7 - LON_RADIUS) && lonCoordCheck <= (lon7 + LON_RADIUS)) {
-        poem = name7.replace(/\s+/g, '')
-        url7 = youtubeUrl7
-        mainHeaderImage.style.backgroundImage = `"url(/image/${poem}.jpg)"`
+    // // Artist 7 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat7 - LAT_RADIUS) && latCoordCheck <= (lat7 + LAT_RADIUS) && lonCoordCheck >= (lon7 - LON_RADIUS) && lonCoordCheck <= (lon7 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `"url(${CMS_IMAGE_URL + image7})"`
 
-        let timer = (((min7*60) + sec7) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url7
+    //     let timer = (((min7*60) + sec7) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink7
 
-        if(!openTab.includes(url7)){
-          playSound(soundFile, timer)
-          identifier = url7
-          openTab.push(url7)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc7
+    //     if(!openTab.includes(soundLink7)){
+    //       playSound(soundFile, timer)
+    //       identifier = artist7
+    //       openTab.push(soundLink7)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist7
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 8 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat8 - LAT_RADIUS) && latCoordCheck <= (lat8 + LAT_RADIUS) && lonCoordCheck >= (lon8 - LON_RADIUS) && lonCoordCheck <= (lon8 + LON_RADIUS)) {
-        poem = name8.replace(/\s+/g, '')
-        url8 = youtubeUrl8
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min8*60) + sec8) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url8
+    // // Artist 8 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat8 - LAT_RADIUS) && latCoordCheck <= (lat8 + LAT_RADIUS) && lonCoordCheck >= (lon8 - LON_RADIUS) && lonCoordCheck <= (lon8 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image8})`
+    //     let timer = (((min8*60) + sec8) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink8
 
-        if(!openTab.includes(url8)){
-          playSound(soundFile, timer)
-          identifier = url8
-          openTab.push(url8)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc8
+    //     if(!openTab.includes(soundLink8)){
+    //       playSound(soundFile, timer)
+    //       identifier = artist8
+    //       openTab.push(soundLink8)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist8
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 9 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat9 - LAT_RADIUS) && latCoordCheck <= (lat9 + LAT_RADIUS) && lonCoordCheck >= (lon9 - LON_RADIUS) && lonCoordCheck <= (lon9 + LON_RADIUS)) {
-        poem = name9.replace(/\s+/g, '')
-        url9 = youtubeUrl9
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        let timer = (((min9*60) + sec9) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url9
+    // // Artist 9 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat9 - LAT_RADIUS) && latCoordCheck <= (lat9 + LAT_RADIUS) && lonCoordCheck >= (lon9 - LON_RADIUS) && lonCoordCheck <= (lon9 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image9})`
+    //     let timer = (((min9*60) + sec9) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink9
 
-        if(!openTab.includes(url9)){
-          playSound(soundFile, timer)
-          identifier = url9
-          openTab.push(url9)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc9
+    //     if(!openTab.includes(soundLink9)){
+    //       playSound(soundFile, timer)
+    //       identifier = artist9
+    //       openTab.push(soundLink9)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist9
   
-      }
-    }
+    //   }
+    // }
 
-    // POEM 10 //////
-    if(!tabHasLaunched) {
-      if(latCoordCheck >= (lat10 - LAT_RADIUS) && latCoordCheck <= (lat10 + LAT_RADIUS) && lonCoordCheck >= (lon10 - LON_RADIUS) && lonCoordCheck <= (lon10 + LON_RADIUS)) {
-        poem = name10.replace(/\s+/g, '')
-        url10 = youtubeUrl10
-        mainHeaderImage.style.backgroundImage = `url(/image/${poem}.jpg)`
-        console.log("header image", mainHeaderImage.style.backgroundImage)
-        let timer = (((min10*60) + sec10) * 1000)
-        let soundFile = SOUND_DRIVE_URL + url10
+    // // Artist 10 //////
+    // if(!tabHasLaunched) {
+    //   if(latCoordCheck >= (lat10 - LAT_RADIUS) && latCoordCheck <= (lat10 + LAT_RADIUS) && lonCoordCheck >= (lon10 - LON_RADIUS) && lonCoordCheck <= (lon10 + LON_RADIUS)) {
+    //     mainHeaderImage.style.backgroundImage = `url(${CMS_IMAGE_URL + image10})`
+    //     console.log("header image", mainHeaderImage.style.backgroundImage)
+    //     let timer = (((min10*60) + sec10) * 1000)
+    //     let soundFile = SOUND_DRIVE_URL + soundLink10
 
-        if(!openTab.includes(url10)){
-          playSound(soundFile, timer)
-          identifier = url10
-          openTab.push(url10)
-          tabHasLaunched = true;
-          if(openTab[1]) {
-            closeTab()
-          }
-          setTimeout(() => {
-            tabHasLaunched = false;
-          }, timer)
-        }
-        sheets.style.fontWeight = 'bold'
-        sheets.innerText = loc10
+    //     if(!openTab.includes(soundLink10)){
+    //       playSound(soundFile, timer)
+    //       identifier = artist10
+    //       openTab.push(soundLink10)
+    //       tabHasLaunched = true;
+    //       if(openTab[1]) {
+    //         closeTab()
+    //       }
+    //       setTimeout(() => {
+    //         tabHasLaunched = false;
+    //       }, timer)
+    //     }
+    //     sheets.style.fontWeight = 'bold'
+    //     sheets.innerText = artist10
   
-      }
+    //   }
 
-    }
+    // }
 
 
 

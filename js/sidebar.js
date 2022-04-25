@@ -35,6 +35,6 @@ const toggleDetails = () => {
   }
 }
 
-openBtn.addEventListener('click', openMobileNav)
-closeBtn.addEventListener('click', closeMobileNav)
+// openBtn.addEventListener('click', openMobileNav)
+// closeBtn.addEventListener('click', closeMobileNav)
 detailsBtn.addEventListener('click', toggleDetails)
