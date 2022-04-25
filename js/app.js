@@ -12,10 +12,10 @@ const leftArrow = document.querySelector('.arrow')
 const mainHeaderImage = document.getElementById('main-header')
 
 
-const stopBtn = document.getElementById('stop-sound')
-const resumeBtn = document.getElementById('resume-sound')
-stopBtn.style.display = 'none'
-resumeBtn.style.display = 'none'
+// const stopBtn = document.getElementById('stop-sound')
+// const resumeBtn = document.getElementById('resume-sound')
+// stopBtn.style.display = 'none'
+// resumeBtn.style.display = 'none'
 
 
 const MASTER_URL = 'https://docs.google.com/spreadsheets/d/1b6kB5xtP_M0hMLRzxT0uDwhuM9ABvzsMUZRVsnezgXU/gviz/tq?tqx=out:json'
@@ -96,60 +96,60 @@ function startWatch() {
 function playSound(soundUrl, timer) {
   let soundFile = new Sound(soundUrl)
   soundComp = soundFile;
-  stopBtn.addEventListener('click', () => {
-    soundFile.stop()
-    stopBtn.style.boxShadow = '0 0 8px 8px #ffffff'
-    resumeBtn.style.boxShadow = 'none'
-    // paused = true;
-    // const timeCounter = () => {
-    //   addTime += 1;
-    //   console.log(addTime)
-    // }
-    // let timeCountInitial = setInterval(timeCounter, 1000)
+  // stopBtn.addEventListener('click', () => {
+  //   soundFile.stop()
+  //   stopBtn.style.boxShadow = '0 0 8px 8px #ffffff'
+  //   resumeBtn.style.boxShadow = 'none'
+  //   // paused = true;
+  //   // const timeCounter = () => {
+  //   //   addTime += 1;
+  //   //   console.log(addTime)
+  //   // }
+  //   // let timeCountInitial = setInterval(timeCounter, 1000)
 
     
-    // stopBtn.style.display = 'none'
-    console.log("Sound Stopped")
-  })
-  resumeBtn.addEventListener('click', () => {
-    soundFile.play()
-    resumeBtn.style.boxShadow = '0 0 8px 8px #ffffff'
-    stopBtn.style.boxShadow = 'none'
-    // paused = false;
-    // clearInterval(timeCountInitial)
+  //   // stopBtn.style.display = 'none'
+  //   // console.log("Sound Stopped")
+  // })
+  // resumeBtn.addEventListener('click', () => {
+  //   soundFile.play()
+  //   resumeBtn.style.boxShadow = '0 0 8px 8px #ffffff'
+  //   stopBtn.style.boxShadow = 'none'
+  //   // paused = false;
+  //   // clearInterval(timeCountInitial)
     
-  })
-  stopBtn.style.display = 'flex'
-  stopBtn.style.position = 'absolute'
-  stopBtn.style.bottom = '40%'
-  stopBtn.style.left = '5%'
-  stopBtn.style.border = 'none'
-  stopBtn.style.borderRadius = '12px'
-  stopBtn.style.padding = '1em'
-  stopBtn.style.fontSize = '1.5em'
-  stopBtn.style.backgroundColor = 'hsla(0, 0%, 5%, .8'
-  stopBtn.style.color = 'hsl(0, 0%, 100%)'
-  resumeBtn.style.display = 'flex'
-  resumeBtn.style.position = 'absolute'
-  resumeBtn.style.bottom = '40%'
-  resumeBtn.style.right = '5%'
-  resumeBtn.style.border = 'none'
-  resumeBtn.style.borderRadius = '12px'
-  resumeBtn.style.padding = '1em'
-  resumeBtn.style.fontSize = '1.5em'
-  resumeBtn.style.backgroundColor = 'hsla(0, 0%, 5%, .8'
-  resumeBtn.style.boxShadow = '0 0 8px 8px #ffffff'
-  resumeBtn.style.color = 'hsl(0, 0%, 100%)'
+  // })
+  // stopBtn.style.display = 'flex'
+  // stopBtn.style.position = 'absolute'
+  // stopBtn.style.bottom = '40%'
+  // stopBtn.style.left = '5%'
+  // stopBtn.style.border = 'none'
+  // stopBtn.style.borderRadius = '12px'
+  // stopBtn.style.padding = '1em'
+  // stopBtn.style.fontSize = '1.5em'
+  // stopBtn.style.backgroundColor = 'hsla(0, 0%, 5%, .8'
+  // stopBtn.style.color = 'hsl(0, 0%, 100%)'
+  // resumeBtn.style.display = 'flex'
+  // resumeBtn.style.position = 'absolute'
+  // resumeBtn.style.bottom = '40%'
+  // resumeBtn.style.right = '5%'
+  // resumeBtn.style.border = 'none'
+  // resumeBtn.style.borderRadius = '12px'
+  // resumeBtn.style.padding = '1em'
+  // resumeBtn.style.fontSize = '1.5em'
+  // resumeBtn.style.backgroundColor = 'hsla(0, 0%, 5%, .8'
+  // resumeBtn.style.boxShadow = '0 0 8px 8px #ffffff'
+  // resumeBtn.style.color = 'hsl(0, 0%, 100%)'
   soundFile.stop()
   soundFile.play()
   console.log("sound playing")
-  setTimeout(() => {
-    soundFile.stop()
-    stopBtn.style.display = 'none'
-    resumeBtn.style.display = 'none'
-    console.log("sound stopped")
+  // setTimeout(() => {
+  //   soundFile.stop()
+  //   stopBtn.style.display = 'none'
+  //   resumeBtn.style.display = 'none'
+  //   console.log("sound stopped")
 
-  }, timer)
+  // }, timer)
 }
 
 
