@@ -2,7 +2,8 @@ const longDisplay = document.getElementById('longDisplay')
 const latDisplay = document.getElementById('latDisplay')
 const statusDisplay = document.getElementById('tracking')
 const trackingBox = document.getElementById('tracking-message-box')
-const sheets = document.getElementById('sheets')
+const campLoc = document.getElementById('campLoc')
+const artName = document.getElementById('artName')
 
 const toggle = document.getElementById('tracking-toggle')
 const onIndicator = document.getElementById('on')
@@ -258,8 +259,8 @@ function setCurrentPosition( position ) {
     
       const createContent = (obj) => {
         trimmedName = obj.name.replace(/\s+/g, '')
-          // obj.url = obj.youtubeUrl
-          mainHeaderImage.style.backgroundImage = `url(${obj.image})`
+          console.log(obj.image)
+          mainHeaderImage.style.backgroundImage = `url("${obj.image}")`
           let timer = (((obj.min*60) + obj.sec) * 1000)
           let soundFile = SOUND_DRIVE_URL + obj.soundLink
           if(!openTab.includes(obj.url)) {
@@ -285,8 +286,10 @@ function setCurrentPosition( position ) {
               tabHasLaunched = false;
             }, timer)
           }
-        sheets.style.fontWeight = 'bold'  
-        sheets.innerText = obj.loc // Output the name of the current poem or location
+        campLoc.style.fontWeight = 'bold'  
+        artName.style.fontWeight = 'bold'  
+        campLoc.innerText = obj.loc // Output the name of the current poem or location
+        artName.innerText = obj.name 
       }
 
     console.log('fetched')
