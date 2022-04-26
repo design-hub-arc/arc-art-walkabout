@@ -6,6 +6,8 @@ const arrow = document.querySelector('.arrow')
 const detailsBtn = document.querySelector('input[type="button"]')
 
 
+
+
 function openMobileNav() {
   sidebar.style.width = "250px";
 

@@ -252,6 +252,9 @@ input:checked + .slider:before {
  .info-content h3 {
    position: relative;
  }
+ #countdown {
+   align-self: flex-end;
+ }
  input[type="button"] {
    align-self: center;
    background-color: hsla(0, 0%, 100%, .8);
