@@ -27,8 +27,8 @@ const CMS_IMAGE_URL = 'https://docs.google.com/uc?export=download&id='
 
 
 //Constants for establishing an equal perimeter. Can be adjusted to fit the bounding area
-const LAT_RADIUS = 0.00008575
-const LON_RADIUS = 0.00008575 // 70 ft radius .000024 = 7ft ~.00000343 = 1ft
+const LAT_RADIUS = 0.0000686
+const LON_RADIUS = 0.0000686 // 70 ft radius .000024 = 7ft ~.00000343 = 1ft
 // position tracking
 let geoWatch;
 let lonCoordCheck;
@@ -79,6 +79,7 @@ if('serviceWorker' in navigator) {
 // begin listening for coordinates and track changes
 function startWatch() {
   console.log('startWatch starting')
+  console.log("tab launch check", tabHasLaunched)
   if(!geoWatch) {
     if('geolocation' in navigator && 'watchPosition' in navigator.geolocation) {
       console.log('gps support')
@@ -405,6 +406,7 @@ function positionError( error ) {
 
 // function to stop the active tracking
 function stopWatch() {
+  tabHasLaunched = false
   navigator.geolocation.clearWatch( geoWatch)
   geoWatch = undefined;
   longDisplay.innerHTML = 'Not Tracking'
