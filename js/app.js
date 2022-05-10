@@ -44,6 +44,7 @@ let trimmedName;
 // Log the currently launched external url
 const openTab = []
 let tabHasLaunched = false;
+let appHasStarted = false;
 
 // Additional time for pause
 let addTime = 0
@@ -71,7 +72,8 @@ class Sound {
 
 // register service worker for caching assets
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
+  console.log('service worker found')
+  navigator.serviceWorker.register('sw.js')
   .then((reg) => console.log('service worker registered', reg))
   .catch((err) => console.log('service worker not registered', err))
 }
@@ -89,6 +91,7 @@ function startWatch() {
         maximumAge: 0
       })
       statusDisplay.innerText = 'Tracking'
+      appHasStarted = true;
     } 
   }
 }
@@ -228,6 +231,40 @@ const createImage = (obj, objLen) => {
   }
 }
 
+const countDown = (timerFuncMin, timerFuncSec) => {
+  let countdownTimer = setInterval(() => {
+    if((timerFuncMin === 0 && timerFuncSec === 0) || appHasStarted === false) {
+      clearInterval(countdownTimer)
+      minuteDisplay.innerText = "0".toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+      })
+      secondDisplay.innerText = "00".toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+      })
+    } else if(timerFuncMin !== 0 && timerFuncSec === 0) {
+      timerFuncMin--
+      timerFuncSec = 59
+      minuteDisplay.innerText = timerFuncMin.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+      })
+      secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+      })
+    } else if(timerFuncMin >= 0 && timerFuncSec >= 0) {
+      timerFuncSec--
+      secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+      })
+    }
+
+  }, 1000)
+}
+
 // begin to fetch coordinates and set the geolocation
 function setCurrentPosition( position ) {
     
@@ -236,7 +273,7 @@ function setCurrentPosition( position ) {
     .then(response => response.text())
     .then(data => {
 
-      // Need to find the start of the json info becuase sheets updates the sig parameter
+      // Need to find the start of the json info because sheets updates the sig parameter
       let colStart = data.indexOf("cols") -2
 
       // Get only the part of the google sheet response that is in json format, parse as json
@@ -269,29 +306,30 @@ function setCurrentPosition( position ) {
             let timerFuncMin = obj.min
             let timerFuncSec = obj.sec
 
-            let countdownTimer = setInterval(() => {
-              if(timerFuncMin === 0 && timerFuncSec === 0) {
-                clearInterval(countdownTimer)
-              } else if(timerFuncMin !== 0 && timerFuncSec === 0) {
-                timerFuncMin--
-                timerFuncSec = 59
-                minuteDisplay.innerText = timerFuncMin.toLocaleString('en-US', {
-                  minimumIntegerDigits: 2,
-                  useGrouping: false
-                })
-                secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
-                  minimumIntegerDigits: 2,
-                  useGrouping: false
-                })
-              } else if(timerFuncMin >= 0 && timerFuncSec >= 0) {
-                timerFuncSec--
-                secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
-                  minimumIntegerDigits: 2,
-                  useGrouping: false
-                })
-              }
+            countDown(timerFuncMin, timerFuncSec)
+            // let countdownTimer = setInterval(() => {
+            //   if(timerFuncMin === 0 && timerFuncSec === 0) {
+            //     clearInterval(countdownTimer)
+            //   } else if(timerFuncMin !== 0 && timerFuncSec === 0) {
+            //     timerFuncMin--
+            //     timerFuncSec = 59
+            //     minuteDisplay.innerText = timerFuncMin.toLocaleString('en-US', {
+            //       minimumIntegerDigits: 2,
+            //       useGrouping: false
+            //     })
+            //     secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
+            //       minimumIntegerDigits: 2,
+            //       useGrouping: false
+            //     })
+            //   } else if(timerFuncMin >= 0 && timerFuncSec >= 0) {
+            //     timerFuncSec--
+            //     secondDisplay.innerText = timerFuncSec.toLocaleString('en-US', {
+            //       minimumIntegerDigits: 2,
+            //       useGrouping: false
+            //     })
+            //   }
 
-            }, 1000)
+            // }, 1000)
             // Set identifier to current poem
             identifier = obj.url
             
@@ -397,9 +435,9 @@ function positionError( error ) {
       console.error("The request has timed out")
       break;
 
-    case error.UNKOWN_ERROR:
+    case error.UNKNOWN_ERROR:
 
-      console.error("An unkown error occured")
+      console.error("An unknown error occurred")
       break;
   }
 }
@@ -413,6 +451,7 @@ function stopWatch() {
   latDisplay.innerHTML = 'Not Tracking'
   statusDisplay.innerHTML = 'Off'
   soundComp.stop()
+  appHasStarted = false
   console.log("soundFile from stopped", soundComp)
   console.log('tracking stopped')
 }

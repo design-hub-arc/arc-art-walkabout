@@ -1,5 +1,5 @@
-const cacheName = 'site-static-v01-15' // need to update version with changes
-const dynamicCacheName = 'site-dynamic-v01-15' // need to update version with changes
+const cacheName = 'site-static-v01-17' // need to update version with changes
+const dynamicCacheName = 'site-dynamic-v01-17' // need to update version with changes
 const assets = [
   '/',
   '/index.html',
@@ -70,7 +70,7 @@ self.addEventListener('fetch', (event) => {
     }).catch(() => {
       // If the requested page is not stored in the cache, the fallback page is returned
       if(event.request.url.indexOf('html') > -1) {
-        return caches.match('/routes/fallback.html')
+        return caches.match('./routes/fallback.html')
       }
     })
   )
