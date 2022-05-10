@@ -22,7 +22,7 @@ const mainHeaderImage = document.getElementById('main-header')
 
 const MASTER_URL = 'https://docs.google.com/spreadsheets/d/1b6kB5xtP_M0hMLRzxT0uDwhuM9ABvzsMUZRVsnezgXU/gviz/tq?tqx=out:json'
 // const MASTER_URL = 'https://docs.google.com/spreadsheets/d/15WHrKYdLhyepMQPdWtqZQAeHonpC-ntF1PIldJz_hjQ/gviz/tq?tqx=out:json'
-const SOUND_DRIVE_URL = 'https://docs.google.com/uc?export=download&id='
+// const SOUND_DRIVE_URL = 'https://docs.google.com/uc?export=download&id=' // If the soundfile source is from a google drive
 const CMS_IMAGE_URL = 'https://docs.google.com/uc?export=download&id='
 
 
@@ -297,7 +297,7 @@ function setCurrentPosition( position ) {
         trimmedName = obj.name.replace(/\s+/g, '')
           mainHeaderImage.style.backgroundImage = `url("${obj.image}")`
           let timer = (((obj.min*60) + obj.sec) * 1000)
-          let soundFile = SOUND_DRIVE_URL + obj.soundLink
+          let soundFile = obj.soundLink
           if(!openTab.includes(obj.url)) {
               
             playSound(soundFile, timer)
