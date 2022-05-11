@@ -1,5 +1,5 @@
-const cacheName = 'site-static-v01-19' // need to update version with changes
-const dynamicCacheName = 'site-dynamic-v01-19' // need to update version with changes
+const cacheName = 'site-static-v01-21' // need to update version with changes
+const dynamicCacheName = 'site-dynamic-v01-21' // need to update version with changes
 const assets = [
   '/',
   '/index.html',
@@ -63,7 +63,7 @@ self.addEventListener('fetch', (event) => {
         return caches.open(dynamicCacheName).then(cache => {
           cache.put(event.request.url, fetchRes.clone());
           // Function to limit the size of cached assets. Can be updated as desired
-          limitCacheSize(dynamicCacheName, 6)
+          limitCacheSize(dynamicCacheName, 10)
           return fetchRes;
         })
       })

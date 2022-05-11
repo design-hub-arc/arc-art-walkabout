@@ -27,8 +27,8 @@ const CMS_IMAGE_URL = 'https://docs.google.com/uc?export=download&id='
 
 
 //Constants for establishing an equal perimeter. Can be adjusted to fit the bounding area
-const LAT_RADIUS = 0.0000686
-const LON_RADIUS = 0.0000686 // 70 ft radius .000024 = 7ft ~.00000343 = 1ft
+const LAT_RADIUS = 0.00005145
+const LON_RADIUS = 0.00005145 // 15 ft radius .000024 = 7ft ~.00000343 = 1ft
 // position tracking
 let geoWatch;
 let lonCoordCheck;
